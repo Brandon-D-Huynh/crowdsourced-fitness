@@ -68,7 +68,6 @@ export default function NewChallengeScreen() {
         category,
         tags,
         startsAt: startsAt ?? null,
-        timeZone,
         createdBy: uid,
         createdAt: serverTimestamp(),
       });
