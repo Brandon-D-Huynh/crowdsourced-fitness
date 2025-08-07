@@ -1,6 +1,7 @@
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Button, StyleSheet, TextInput } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -48,8 +49,7 @@ export default function SignUpScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Create account</ThemedText>
-      <TextInput
-        style={styles.input}
+      <ThemedTextInput
         autoCapitalize="none"
         autoComplete="email"
         keyboardType="email-address"
@@ -57,8 +57,7 @@ export default function SignUpScreen() {
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
-        style={styles.input}
+      <ThemedTextInput
         placeholder="Password (min 6 chars)"
         secureTextEntry
         value={password}
@@ -75,11 +74,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
   },
 });

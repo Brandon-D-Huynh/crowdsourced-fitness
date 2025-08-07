@@ -1,6 +1,7 @@
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Button, StyleSheet, TextInput } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -32,8 +33,7 @@ export default function ForgotPasswordScreen() {
         <ThemedText>A password reset link has been sent to your email address.</ThemedText>
       ) : (
         <>
-          <TextInput
-            style={styles.input}
+          <ThemedTextInput
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
@@ -58,11 +58,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
   },
 });

@@ -1,7 +1,8 @@
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { Link, router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Button, StyleSheet, TextInput, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -42,8 +43,7 @@ export default function SignInScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Welcome back</ThemedText>
-      <TextInput
-        style={styles.input}
+      <ThemedTextInput
         autoCapitalize="none"
         autoComplete="email"
         keyboardType="email-address"
@@ -51,8 +51,7 @@ export default function SignInScreen() {
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
-        style={styles.input}
+      <ThemedTextInput
         placeholder="Password"
         secureTextEntry
         value={password}
@@ -76,11 +75,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     gap: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
   },
 });
