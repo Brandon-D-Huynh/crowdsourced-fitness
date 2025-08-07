@@ -1,17 +1,36 @@
 import { router } from 'expo-router';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Button, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { auth } from '@/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
+
+interface Profile {
+  displayName?: string;
+  username?: string;
+  bio?: string;
+  fitnessGoal?: string;
+}
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => setUser(u));
+    const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u) {
+        const profileDoc = doc(db, 'profiles', u.uid);
+        const unsubscribeProfile = onSnapshot(profileDoc, (doc) => {
+          setProfile(doc.data() as Profile);
+        });
+        return () => unsubscribeProfile();
+      }
+    });
+    return () => unsubscribeAuth();
   }, []);
 
   const onSignOut = async () => {
@@ -26,7 +45,13 @@ export default function ProfileScreen() {
     <ThemedView style={styles.container}>
       {user ? (
         <View style={{ gap: 12 }}>
-          <ThemedText type="title">Profile</ThemedText>
+          <ThemedText type="title">{profile?.displayName ?? 'Profile'}</ThemedText>
+          {profile?.username && <ThemedText type="subtitle">@{profile.username}</ThemedText>}
+          {profile?.bio && <ThemedText>{profile.bio}</ThemedText>}
+          {profile?.fitnessGoal && <ThemedText>Goal: {profile.fitnessGoal}</ThemedText>}
+
+          <View style={{ height: 24 }} />
+
           <ThemedText>UID: {user.uid}</ThemedText>
           <ThemedText>Email: {user.email}</ThemedText>
           <Button title="Sign Out" onPress={onSignOut} />

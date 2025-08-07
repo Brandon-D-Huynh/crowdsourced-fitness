@@ -38,7 +38,7 @@ export default function SignUpScreen() {
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), password);
-      router.replace('/');
+      router.replace('/(auth)/create-profile');
     } catch (e: any) {
       setError(getFriendlyErrorMessage(e));
     } finally {
