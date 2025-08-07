@@ -76,7 +76,7 @@ export default function ChallengeDetailScreen() {
       const [pSnap, cSnap] = await Promise.all([tx.get(pref), tx.get(cref)]);
       if (!pSnap.exists()) {
         const current = (cSnap.data()?.participantsCount || 0) as number;
-        tx.set(pref, { joinedAt: serverTimestamp() });
+        tx.set(pref, { joinedAt: serverTimestamp(), uid });
         tx.update(cref, { participantsCount: current + 1 });
       }
     });

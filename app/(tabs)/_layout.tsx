@@ -34,7 +34,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="challenges"
+        name="challenges/index"
         options={{
           title: 'Challenges',
           headerShown: false,
