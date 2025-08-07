@@ -12,6 +12,9 @@ interface Challenge {
   title: string;
   description?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
+  category?: string;
+  tags?: string[];
+  participantsCount?: number;
   createdAt?: any;
   createdBy?: string;
 }
@@ -66,9 +69,17 @@ export default function ChallengesListScreen() {
             <Link href={`/(tabs)/challenges/${item.id}`} asChild>
               <Pressable style={styles.card}>
                 <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
-                {item.difficulty && (
-                  <ThemedText style={styles.badge}>{item.difficulty}</ThemedText>
-                )}
+                <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                  {item.category && (
+                    <ThemedText style={styles.badge}>{item.category}</ThemedText>
+                  )}
+                  {item.difficulty && (
+                    <ThemedText style={styles.badge}>{item.difficulty}</ThemedText>
+                  )}
+                  {typeof item.participantsCount === 'number' && (
+                    <ThemedText style={styles.badge}>{item.participantsCount} joined</ThemedText>
+                  )}
+                </View>
                 {item.description && (
                   <ThemedText numberOfLines={2}>
                     {item.description}
