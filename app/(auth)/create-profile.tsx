@@ -1,4 +1,5 @@
 
+import { ThemedDropdown } from '@/components/ThemedDropdown';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,6 +8,15 @@ import { doc, setDoc } from 'firebase/firestore';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet } from 'react-native';
+
+const fitnessGoals = [
+  'Build Muscle',
+  'Improve Endurance',
+  'Lose Weight',
+  'Increase Flexibility',
+  'Improve Power',
+  'General Fitness',
+];
 
 export default function CreateProfileScreen() {
   const [displayName, setDisplayName] = useState('');
@@ -66,10 +76,10 @@ export default function CreateProfileScreen() {
         onChangeText={setBio}
         multiline
       />
-      <ThemedTextInput
-        placeholder="Primary Fitness Goal (e.g., Build Muscle)"
-        value={fitnessGoal}
-        onChangeText={setFitnessGoal}
+      <ThemedDropdown
+        options={fitnessGoals}
+        onSelect={setFitnessGoal}
+        placeholder="Select your primary fitness goal"
       />
       {error && <ThemedText style={{ color: 'red' }}>{error}</ThemedText>}
       <Button title={loading ? 'Creating...' : 'Create Profile'} onPress={onCreateProfile} disabled={loading} />
