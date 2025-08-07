@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
-import { router } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import { Button, StyleSheet, TextInput } from 'react-native';
+
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { auth } from '@/firebaseConfig';
+import { router } from 'expo-router';
+
+const getFriendlyErrorMessage = (error: any) => {
+  switch (error.code) {
+    case 'auth/email-already-in-use':
+      return 'This email address is already in use.';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/weak-password':
+      return 'Your password must be at least 6 characters long.';
+    default:
+      return error.message;
+  }
+};
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -14,12 +28,18 @@ export default function SignUpScreen() {
 
   const onSignUp = async () => {
     setError(null);
+
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), password);
       router.replace('/');
     } catch (e: any) {
-      setError(e?.message ?? String(e));
+      setError(getFriendlyErrorMessage(e));
     } finally {
       setLoading(false);
     }

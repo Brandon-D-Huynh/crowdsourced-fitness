@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button, View } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
 import { Link, router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import { Button, StyleSheet, TextInput, View } from 'react-native';
+
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { auth } from '@/firebaseConfig';
+
+const getFriendlyErrorMessage = (error: any) => {
+  switch (error.code) {
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Invalid email or password.';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    default:
+      return error.message;
+  }
+};
 
 export default function SignInScreen() {
   const [email, setEmail] = useState('');
@@ -19,7 +33,7 @@ export default function SignInScreen() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       router.replace('/');
     } catch (e: any) {
-      setError(e?.message ?? String(e));
+      setError(getFriendlyErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -49,6 +63,9 @@ export default function SignInScreen() {
       <View style={{ height: 12 }} />
       <Link href="/(auth)/sign-up">
         <ThemedText type="link">Create an account</ThemedText>
+      </Link>
+      <Link href="/(auth)/forgot-password">
+        <ThemedText type="link">Forgot Password?</ThemedText>
       </Link>
     </ThemedView>
   );

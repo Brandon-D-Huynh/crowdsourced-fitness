@@ -6,7 +6,10 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+import { useProtectedRoute } from '@/hooks/useProtectedRoute';
+
 export default function RootLayout() {
+  useProtectedRoute();
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
