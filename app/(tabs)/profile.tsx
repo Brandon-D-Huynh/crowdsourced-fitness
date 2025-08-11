@@ -12,6 +12,7 @@ import { Button, StyleSheet, View, Image, FlatList } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { ChallengeCard } from "@/components/ChallengeCard";
 import { auth, db } from "@/firebaseConfig";
 import { useThemeColor } from "@/hooks/useThemeColor";
 
@@ -26,7 +27,7 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [challenges, setChallenges] = useState<any[]>([]);
-  const cardBackgroundColor = useThemeColor({}, "card");
+  const cardBackgroundColor = useThemeColor({}, "background");
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
@@ -108,10 +109,9 @@ export default function ProfileScreen() {
               <FlatList
                 data={challenges}
                 keyExtractor={(item) => item.id}
+                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                 renderItem={({ item }) => (
-                  <View style={styles.challengeItem}>
-                    <ThemedText>{item.title}</ThemedText>
-                  </View>
+                  <ChallengeCard challenge={item} />
                 )}
               />
             ) : (
@@ -192,11 +192,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
     alignItems: "center",
     gap: 12,
-  },
-  challengeItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
   },
 });
 

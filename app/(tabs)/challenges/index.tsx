@@ -8,28 +8,16 @@ import {
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { ChallengeCard } from "@/components/ChallengeCard";
 import { Link, router } from "expo-router";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-interface Challenge {
-  id: string;
-  title: string;
-  description?: string;
-  difficulty?: "easy" | "medium" | "hard";
-  category?: string;
-  tags?: string[];
-  participantsCount?: number;
-  createdAt?: any;
-  createdBy?: string;
-  startsAt?: any;
-  endsAt?: any;
-}
 
 export default function ChallengesListScreen() {
   const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState<Challenge[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [signedIn, setSignedIn] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +30,7 @@ export default function ChallengesListScreen() {
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const data: Challenge[] = snap.docs.map((d) => ({
+        const data: any[] = snap.docs.map((d) => ({
           id: d.id,
           ...(d.data() as any),
         }));
@@ -91,44 +79,7 @@ export default function ChallengesListScreen() {
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           renderItem={({ item }) => (
-            <Link href={`/(tabs)/challenges/${item.id}`} asChild>
-              <Pressable style={styles.card}>
-                <ThemedText type="defaultSemiBold" style={styles.cardTitle}>
-                  {item.title}
-                </ThemedText>
-                <View style={styles.badgeContainer}>
-                  {item.category && (
-                    <ThemedText style={[styles.badge, styles.categoryBadge]}>
-                      {item.category}
-                    </ThemedText>
-                  )}
-                  {item.difficulty && (
-                    <ThemedText
-                      style={[styles.badge, styles[`${item.difficulty}Badge`]]}
-                    >
-                      {item.difficulty}
-                    </ThemedText>
-                  )}
-                  {typeof item.participantsCount === "number" && (
-                    <ThemedText
-                      style={[styles.badge, styles.participantsBadge]}
-                    >
-                      {item.participantsCount} joined
-                    </ThemedText>
-                  )}
-                  {item.endsAt && (
-                    <ThemedText style={[styles.badge, styles.dateBadge]}>
-                      Ends: {new Date(item.endsAt.toDate()).toLocaleDateString()}
-                    </ThemedText>
-                  )}
-                </View>
-                {item.description && (
-                  <ThemedText numberOfLines={2} style={styles.cardDescription}>
-                    {item.description}
-                  </ThemedText>
-                )}
-              </Pressable>
-            </Link>
+            <ChallengeCard challenge={item} />
           )}
         />
       )}
@@ -155,31 +106,4 @@ const styles = StyleSheet.create({
   },
   addButtonText: { color: "white", fontWeight: "600" },
   separator: { height: 12 },
-  card: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardTitle: { fontSize: 18, fontWeight: "600", color: "#000000" },
-  cardDescription: { color: "#000000", fontSize: 14 },
-  badgeContainer: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  categoryBadge: { backgroundColor: "#e0f2fe", color: "#0369a1" },
-  easyBadge: { backgroundColor: "#dcfce7", color: "#166534" },
-  mediumBadge: { backgroundColor: "#fef3c7", color: "#92400e" },
-  hardBadge: { backgroundColor: "#fee2e2", color: "#991b1b" },
-  participantsBadge: { backgroundColor: "#f3e8ff", color: "#7e22ce" },
-  dateBadge: { backgroundColor: "#fef2f2", color: "#dc2626" },
 });
