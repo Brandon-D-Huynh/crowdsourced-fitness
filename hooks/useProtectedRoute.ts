@@ -14,6 +14,8 @@ export function useProtectedRoute() {
 
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
+    } else if (user && inAuthGroup) {
+      router.replace('/(tabs)/profile');
     }
   }, [user, loading, segments]);
 }

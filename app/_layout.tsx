@@ -22,9 +22,10 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="edit-profile" options={{ title: 'Edit Profile' }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="edit-profile" options={{ title: 'Edit Profile', headerShown: true }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

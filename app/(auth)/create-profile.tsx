@@ -5,7 +5,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { auth, db } from '@/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
-import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet } from 'react-native';
 
@@ -45,7 +44,7 @@ export default function CreateProfileScreen() {
           bio,
           fitnessGoal,
         });
-        router.replace('/');
+        // Let useProtectedRoute handle the navigation
       } else {
         setError('No authenticated user found. Please sign in again.');
       }

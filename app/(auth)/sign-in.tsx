@@ -32,7 +32,7 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.replace('/');
+      // Let useProtectedRoute handle the navigation
     } catch (e: any) {
       setError(getFriendlyErrorMessage(e));
     } finally {
