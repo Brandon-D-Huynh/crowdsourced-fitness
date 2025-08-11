@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Pressable, Image, Alert } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { auth, db } from '@/firebaseConfig';
-import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { CommentInput } from './CommentInput';
 
 interface Comment {
@@ -72,9 +72,21 @@ export function CommentItem({
           style: 'destructive',
           onPress: async () => {
             try {
+              // If this is a reply, decrease parent's reply count
+              if (comment.parentId) {
+                const parentCommentRef = doc(db, 'challenges', challengeId, 'comments', comment.parentId);
+                await updateDoc(parentCommentRef, {
+                  replyCount: increment(-1)
+                });
+              }
+              
+              // Delete the comment
               await deleteDoc(doc(db, 'challenges', challengeId, 'comments', comment.id));
+              
+              console.log('Comment deleted successfully');
             } catch (error) {
               console.error('Error deleting comment:', error);
+              Alert.alert('Error', 'Failed to delete comment. Please try again.');
             }
           }
         }

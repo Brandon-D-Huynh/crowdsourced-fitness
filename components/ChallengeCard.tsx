@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedText } from './ThemedText';
 
@@ -15,6 +15,7 @@ interface Challenge {
   createdBy?: string;
   startsAt?: any;
   endsAt?: any;
+  imageUrl?: string;
 }
 
 interface ChallengeCardProps {
@@ -25,9 +26,13 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
   return (
     <Link href={`/(tabs)/challenges/${challenge.id}`} asChild>
       <Pressable style={styles.card}>
-        <ThemedText type="defaultSemiBold" style={styles.cardTitle}>
-          {challenge.title}
-        </ThemedText>
+        {challenge.imageUrl && (
+          <Image source={{ uri: challenge.imageUrl }} style={styles.cardImage} />
+        )}
+        <View style={styles.cardContent}>
+          <ThemedText type="defaultSemiBold" style={styles.cardTitle}>
+            {challenge.title}
+          </ThemedText>
         <View style={styles.badgeContainer}>
           {challenge.category && (
             <ThemedText style={[styles.badge, styles.categoryBadge]}>
@@ -54,11 +59,12 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
             </ThemedText>
           )}
         </View>
-        {challenge.description && (
-          <ThemedText numberOfLines={2} style={styles.cardDescription}>
-            {challenge.description}
-          </ThemedText>
-        )}
+          {challenge.description && (
+            <ThemedText numberOfLines={2} style={styles.cardDescription}>
+              {challenge.description}
+            </ThemedText>
+          )}
+        </View>
       </Pressable>
     </Link>
   );
@@ -67,14 +73,22 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
-    padding: 16,
     borderRadius: 12,
-    gap: 8,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    overflow: 'hidden',
+  },
+  cardImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
+  },
+  cardContent: {
+    padding: 16,
+    gap: 8,
   },
   cardTitle: { fontSize: 18, fontWeight: "600", color: "#000000" },
   cardDescription: { color: "#000000", fontSize: 14 },

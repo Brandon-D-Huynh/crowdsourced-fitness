@@ -6,6 +6,7 @@ import {
   StyleSheet,
   View,
   Dimensions,
+  Image,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
@@ -120,6 +121,9 @@ export default function ChallengeDetailScreen() {
 
   const renderDetailsTab = () => (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {item.imageUrl && (
+        <Image source={{ uri: item.imageUrl }} style={styles.heroImage} />
+      )}
       <ThemedText type="title" style={styles.title}>
         {item.title}
       </ThemedText>
@@ -280,6 +284,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: { gap: 16 },
+  heroImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    resizeMode: 'cover',
+    marginBottom: 16,
+  },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 8 },
   badgeContainer: { flexDirection: "row", gap: 8, marginBottom: 12 },
   badge: {

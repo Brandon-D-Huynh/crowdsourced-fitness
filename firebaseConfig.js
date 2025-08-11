@@ -13,7 +13,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDhYLwXkgv7Hqph445CRZsH8hCWspKcQyU",
   authDomain: "crowdsourced-fitness-app.firebaseapp.com",
   projectId: "crowdsourced-fitness-app",
-  storageBucket: "crowdsourced-fitness-app.appspot.com",
+  storageBucket: "crowdsourced-fitness-app.firebasestorage.app",
   messagingSenderId: "610851266378",
   appId: "1:610851266378:web:d2ec9c8960f028331b6bb3",
   measurementId: "G-1L0TMJ0W2Y",
