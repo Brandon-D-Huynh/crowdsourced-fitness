@@ -5,10 +5,12 @@ import {
   ScrollView,
   StyleSheet,
   View,
+  Dimensions,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { CommentSection } from "@/components/CommentSection";
 import { auth, db } from "@/firebaseConfig";
 import {
   collection,
@@ -22,12 +24,15 @@ import {
   setDoc,
 } from "firebase/firestore";
 
+const { height: screenHeight } = Dimensions.get('window');
+
 export default function ChallengeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [item, setItem] = useState<any | null>(null);
   const [joined, setJoined] = useState<boolean>(false);
   const [count, setCount] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'comments'>('details');
 
   useEffect(() => {
     if (!id) return;
@@ -113,90 +118,125 @@ export default function ChallengeDetailScreen() {
       </ThemedView>
     );
 
+  const renderDetailsTab = () => (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ThemedText type="title" style={styles.title}>
+        {item.title}
+      </ThemedText>
+      <View style={styles.badgeContainer}>
+        {item.category && (
+          <ThemedText style={[styles.badge, styles.categoryBadge]}>
+            {item.category}
+          </ThemedText>
+        )}
+        {item.difficulty && (
+          <ThemedText
+            style={[styles.badge, styles[`${item.difficulty}Badge`]]}
+          >
+            {item.difficulty}
+          </ThemedText>
+        )}
+      </View>
+      <ThemedText type="subtitle">Details</ThemedText>
+      {item.startsAt && (
+        <ThemedText style={styles.detailText}>
+          Starts:{" "}
+          {item.startsAt.toDate
+            ? item.startsAt.toDate().toISOString().slice(0, 10)
+            : String(item.startsAt)}
+        </ThemedText>
+      )}
+      {item.endsAt && (
+        <ThemedText style={styles.detailText}>
+          Ends:{" "}
+          {item.endsAt.toDate
+            ? item.endsAt.toDate().toISOString().slice(0, 10)
+            : String(item.endsAt)}
+        </ThemedText>
+      )}
+      {Array.isArray(item.tags) && item.tags.length > 0 && (
+        <>
+          <ThemedText type="subtitle">Tags</ThemedText>
+          <View style={styles.tagsContainer}>
+            {item.tags.map((t: string) => (
+              <ThemedText key={t} style={styles.tag}>
+                #{t}
+              </ThemedText>
+            ))}
+          </View>
+        </>
+      )}
+      {typeof count === "number" && (
+        <>
+          <ThemedText type="subtitle">Participants</ThemedText>
+          <ThemedText style={styles.detailText}>
+            {count} participant{count === 1 ? "" : "s"}
+          </ThemedText>
+        </>
+      )}
+      {item.description && (
+        <>
+          <ThemedText type="subtitle">Description</ThemedText>
+          <ThemedText style={styles.description}>
+            {item.description}
+          </ThemedText>
+        </>
+      )}
+
+      <View style={styles.buttonContainer}>
+        {joined ? (
+          <Pressable
+            style={[styles.button, styles.leaveButton]}
+            onPress={onLeave}
+          >
+            <ThemedText style={styles.buttonText}>Leave</ThemedText>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={[styles.button, styles.joinButton]}
+            onPress={onJoin}
+          >
+            <ThemedText style={styles.buttonText}>Join</ThemedText>
+          </Pressable>
+        )}
+      </View>
+    </ScrollView>
+  );
+
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <ThemedText type="title" style={styles.title}>
-          {item.title}
-        </ThemedText>
-        <View style={styles.badgeContainer}>
-          {item.category && (
-            <ThemedText style={[styles.badge, styles.categoryBadge]}>
-              {item.category}
-            </ThemedText>
-          )}
-          {item.difficulty && (
-            <ThemedText
-              style={[styles.badge, styles[`${item.difficulty}Badge`]]}
-            >
-              {item.difficulty}
-            </ThemedText>
-          )}
-        </View>
-        <ThemedText type="subtitle">Details</ThemedText>
-        {item.startsAt && (
-          <ThemedText style={styles.detailText}>
-            Starts:{" "}
-            {item.startsAt.toDate
-              ? item.startsAt.toDate().toISOString().slice(0, 10)
-              : String(item.startsAt)}
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <Pressable
+          style={[styles.tab, activeTab === 'details' && styles.activeTab]}
+          onPress={() => setActiveTab('details')}
+        >
+          <ThemedText style={[
+            styles.tabText,
+            activeTab === 'details' && styles.activeTabText
+          ]}>
+            Details
           </ThemedText>
-        )}
-        {item.endsAt && (
-          <ThemedText style={styles.detailText}>
-            Ends:{" "}
-            {item.endsAt.toDate
-              ? item.endsAt.toDate().toISOString().slice(0, 10)
-              : String(item.endsAt)}
+        </Pressable>
+        <Pressable
+          style={[styles.tab, activeTab === 'comments' && styles.activeTab]}
+          onPress={() => setActiveTab('comments')}
+        >
+          <ThemedText style={[
+            styles.tabText,
+            activeTab === 'comments' && styles.activeTabText
+          ]}>
+            Comments
           </ThemedText>
-        )}
-        {Array.isArray(item.tags) && item.tags.length > 0 && (
-          <>
-            <ThemedText type="subtitle">Tags</ThemedText>
-            <View style={styles.tagsContainer}>
-              {item.tags.map((t: string) => (
-                <ThemedText key={t} style={styles.tag}>
-                  #{t}
-                </ThemedText>
-              ))}
-            </View>
-          </>
-        )}
-        {typeof count === "number" && (
-          <>
-            <ThemedText type="subtitle">Participants</ThemedText>
-            <ThemedText style={styles.detailText}>
-              {count} participant{count === 1 ? "" : "s"}
-            </ThemedText>
-          </>
-        )}
-        {item.description && (
-          <>
-            <ThemedText type="subtitle">Description</ThemedText>
-            <ThemedText style={styles.description}>
-              {item.description}
-            </ThemedText>
-          </>
-        )}
+        </Pressable>
+      </View>
 
-        <View style={styles.buttonContainer}>
-          {joined ? (
-            <Pressable
-              style={[styles.button, styles.leaveButton]}
-              onPress={onLeave}
-            >
-              <ThemedText style={styles.buttonText}>Leave</ThemedText>
-            </Pressable>
-          ) : (
-            <Pressable
-              style={[styles.button, styles.joinButton]}
-              onPress={onJoin}
-            >
-              <ThemedText style={styles.buttonText}>Join</ThemedText>
-            </Pressable>
-          )}
-        </View>
-      </ScrollView>
+      {/* Tab Content */}
+      <View style={styles.tabContent}>
+        {activeTab === 'details' ? renderDetailsTab() : (
+          <CommentSection challengeId={String(id)} />
+        )}
+      </View>
     </ThemedView>
   );
 }
@@ -204,6 +244,41 @@ export default function ChallengeDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#f3f4f6",
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  activeTab: {
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#6b7280",
+  },
+  activeTabText: {
+    color: "#2563eb",
+    fontWeight: "600",
+  },
+  tabContent: {
+    flex: 1,
+  },
   scrollContainer: { gap: 16 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 8 },
   badgeContainer: { flexDirection: "row", gap: 8, marginBottom: 12 },

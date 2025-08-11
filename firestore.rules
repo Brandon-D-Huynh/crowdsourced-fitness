@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Existing rules for challenges
+    match /challenges/{challengeId} {
+      allow read: true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        (request.auth.uid == resource.data.createdBy ||
+         // Allow participant count updates
+         request.writeFields.hasOnly(['participantsCount']));
+      allow delete: if request.auth != null && request.auth.uid == resource.data.createdBy;
+      
+      // Participants subcollection
+      match /participants/{participantId} {
+        allow read: true;
+        allow write: if request.auth != null;
+      }
+      
+      // Comments subcollection - NEW RULES
+      match /comments/{commentId} {
+        // Anyone can read comments
+        allow read: true;
+        
+        // Authenticated users can create comments
+        allow create: if request.auth != null &&
+          request.auth.uid == request.resource.data.authorId &&
+          request.resource.data.keys().hasAll(['text', 'authorId', 'authorName', 'createdAt', 'reactions', 'replyCount', 'isEdited']) &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 &&
+          request.resource.data.text.size() <= 500 &&
+          request.resource.data.authorId == request.auth.uid &&
+          request.resource.data.reactions.keys().hasAll(['likes', 'hearts', 'fires', 'claps']) &&
+          request.resource.data.replyCount is int &&
+          request.resource.data.isEdited is bool;
+        
+        // Users can update their own comments (for editing and reactions)
+        allow update: if request.auth != null && (
+          // Author can edit their comment text
+          (request.auth.uid == resource.data.authorId &&
+           request.writeFields.hasAny(['text', 'updatedAt', 'isEdited'])) ||
+          // Any authenticated user can update reactions
+          request.writeFields.hasOnly(['reactions']) ||
+          // System can update reply count
+          request.writeFields.hasOnly(['replyCount'])
+        );
+        
+        // Users can delete their own comments
+        allow delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+      }
+    }
+    
+    // Existing rules for profiles
+    match /profiles/{userId} {
+      allow read: true;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow reading user data for comment display
+    match /users/{userId} {
+      allow read: true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
