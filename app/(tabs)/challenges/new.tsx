@@ -103,6 +103,8 @@ export default function NewChallengeScreen() {
         value={description}
         onChangeText={setDescription}
       />
+      
+      <ThemedText type="subtitle">Difficulty</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {(['easy', 'medium', 'hard'] as const).map((d) => (
           <Button
