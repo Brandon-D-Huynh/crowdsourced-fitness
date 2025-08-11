@@ -23,6 +23,8 @@ interface Challenge {
   participantsCount?: number;
   createdAt?: any;
   createdBy?: string;
+  startsAt?: any;
+  endsAt?: any;
 }
 
 export default function ChallengesListScreen() {
@@ -114,6 +116,11 @@ export default function ChallengesListScreen() {
                       {item.participantsCount} joined
                     </ThemedText>
                   )}
+                  {item.endsAt && (
+                    <ThemedText style={[styles.badge, styles.dateBadge]}>
+                      Ends: {new Date(item.endsAt.toDate()).toLocaleDateString()}
+                    </ThemedText>
+                  )}
                 </View>
                 {item.description && (
                   <ThemedText numberOfLines={2} style={styles.cardDescription}>
@@ -174,4 +181,5 @@ const styles = StyleSheet.create({
   mediumBadge: { backgroundColor: "#fef3c7", color: "#92400e" },
   hardBadge: { backgroundColor: "#fee2e2", color: "#991b1b" },
   participantsBadge: { backgroundColor: "#f3e8ff", color: "#7e22ce" },
+  dateBadge: { backgroundColor: "#fef2f2", color: "#dc2626" },
 });

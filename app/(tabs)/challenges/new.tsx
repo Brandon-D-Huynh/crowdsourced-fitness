@@ -27,6 +27,7 @@ export default function NewChallengeScreen() {
 
   const [tagsInput, setTagsInput] = useState('');
   const [startsAtInput, setStartsAtInput] = useState(''); // YYYY-MM-DD
+  const [endsAtInput, setEndsAtInput] = useState(''); // YYYY-MM-DD
 
   const onCreate = async () => {
     setError(null);
@@ -62,6 +63,16 @@ export default function NewChallengeScreen() {
         }
       }
 
+      let endsAt: Timestamp | null = null;
+      if (endsAtInput.trim()) {
+        const m = endsAtInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (m) {
+          const [_, y, mo, d] = m;
+          const dt = new Date(Number(y), Number(mo) - 1, Number(d), 23, 59, 59); // End of day
+          endsAt = Timestamp.fromDate(dt);
+        }
+      }
+
       await addDoc(collection(db, 'challenges'), {
         title: title.trim(),
         description: description.trim(),
@@ -69,6 +80,7 @@ export default function NewChallengeScreen() {
         category,
         tags,
         startsAt: startsAt ?? null,
+        endsAt: endsAt ?? null,
         createdBy: uid,
         createdAt: serverTimestamp(),
       });
@@ -121,11 +133,18 @@ export default function NewChallengeScreen() {
         onChangeText={setTagsInput}
       />
 
-      <ThemedText type="subtitle">Start date/time</ThemedText>
+      <ThemedText type="subtitle">Start date</ThemedText>
       <ThemedTextInput
         placeholder="YYYY-MM-DD"
         value={startsAtInput}
         onChangeText={setStartsAtInput}
+      />
+
+      <ThemedText type="subtitle">End date</ThemedText>
+      <ThemedTextInput
+        placeholder="YYYY-MM-DD"
+        value={endsAtInput}
+        onChangeText={setEndsAtInput}
       />
 
       {error && <ThemedText style={{ color: 'red' }}>{error}</ThemedText>}

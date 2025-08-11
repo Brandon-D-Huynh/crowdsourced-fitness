@@ -142,6 +142,14 @@ export default function ChallengeDetailScreen() {
               : String(item.startsAt)}
           </ThemedText>
         )}
+        {item.endsAt && (
+          <ThemedText style={styles.detailText}>
+            Ends:{" "}
+            {item.endsAt.toDate
+              ? item.endsAt.toDate().toISOString().slice(0, 10)
+              : String(item.endsAt)}
+          </ThemedText>
+        )}
         {Array.isArray(item.tags) && item.tags.length > 0 && (
           <>
             <ThemedText type="subtitle">Tags</ThemedText>
