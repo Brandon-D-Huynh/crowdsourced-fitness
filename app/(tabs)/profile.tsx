@@ -8,7 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, View, Image, FlatList } from "react-native";
+import { Button, StyleSheet, View, Image, FlatList, Pressable } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -27,6 +27,7 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [challenges, setChallenges] = useState<any[]>([]);
+  const [activeChallenges, setActiveChallenges] = useState<any[]>([]);
   const cardBackgroundColor = useThemeColor({}, "background");
 
   useEffect(() => {
@@ -60,6 +61,18 @@ export default function ProfileScreen() {
     });
     return () => unsubscribeAuth();
   }, []);
+
+  // Filter active challenges
+  useEffect(() => {
+    const now = new Date();
+    const active = challenges.filter(challenge => {
+      // If no start date or start date is in the past/today, and no end date or end date is in the future/today
+      const hasStarted = !challenge.startsAt || challenge.startsAt.toDate() <= now;
+      const hasNotEnded = !challenge.endsAt || challenge.endsAt.toDate() >= now;
+      return hasStarted && hasNotEnded;
+    });
+    setActiveChallenges(active);
+  }, [challenges]);
 
   const onSignOut = async () => {
     try {
@@ -104,10 +117,18 @@ export default function ProfileScreen() {
             <Button title="Sign Out" onPress={onSignOut} color="#FF3B30" />
           </View>
           <View style={styles.challengesContainer}>
-            <ThemedText type="subtitle">Joined Challenges</ThemedText>
-            {challenges.length > 0 ? (
+            <View style={styles.challengeHeaderRow}>
+              <ThemedText type="subtitle">Active Challenges</ThemedText>
+              <Pressable
+                style={styles.historyButton}
+                onPress={() => router.push("/history")}
+              >
+                <ThemedText style={styles.historyButtonText}>View History</ThemedText>
+              </Pressable>
+            </View>
+            {activeChallenges.length > 0 ? (
               <FlatList
-                data={challenges}
+                data={activeChallenges}
                 keyExtractor={(item) => item.id}
                 ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                 renderItem={({ item }) => (
@@ -115,7 +136,7 @@ export default function ProfileScreen() {
                 )}
               />
             ) : (
-              <ThemedText>You have not joined any challenges yet.</ThemedText>
+              <ThemedText>You have no active challenges.</ThemedText>
             )}
           </View>
         </View>
@@ -192,6 +213,23 @@ const styles = StyleSheet.create({
     marginTop: 24,
     alignItems: "center",
     gap: 12,
+  },
+  challengeHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+  historyButton: {
+    backgroundColor: "#6b7280",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  historyButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "500",
   },
 });
 
